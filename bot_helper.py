@@ -23,15 +23,23 @@ def read_file():
 
 
 @input_error
-def add_help():
-    return """help - output command, that help find command\nhello - output command 'How can I help you?'\nadd - add contact, use 'add' 'name' 'number'\nchange - change your contact, use 'change' 'name' 'number'\nphone - use 'phone' 'name' that see number this contact\nshow all - show all your contacts"""
+def help_command():
+    help_list = [
+        'help - output command, that help find command',
+        'hello - output command "How can I help you?"',
+        'add - add contact, use "add" "name" "number"',
+        'change - change your contact, use "change" "name" "number"',
+        'phone - use "phone" "name" that see number this contact',
+        'show all - show all your contacts',
+    ]
+    return '\n'.join(help_list)
 
 @input_error
-def add_bye(*args):
+def bye_command(*args):
     return "Good bye, see you soon"
 
 @input_error
-def add_hello(*args):
+def hello_command(*args):
     return "How can I help You?\nIf you want to know what I can do write Help "
 
 #работа с текстом
@@ -42,7 +50,7 @@ def write_file(contacts):
 
 #создание контакта
 @input_error
-def add_add(*args):
+def add_command(*args):
     name = args[0]
     number = args[1]
     contacts = read_file()
@@ -55,19 +63,20 @@ def add_add(*args):
 
 #изменение контакта
 @input_error
-def add_change(*args):
+def change_command(*args):
     name = args[0]
     number = args[1]
     contacts = read_file()
     if contacts.get(name):
-        contacts.update({name: number})
+        # contacts.update({name: number})
+        contacts[name] = number # тут все одно ми вже знаємо, що контакт існує)
     else:
         return f'No contact "{name}"'
     write_file(contacts)
     return f"Contact '{name}' change successfully"
 
 @input_error
-def add_phone(*args):
+def add_phone_command(*args):
     name = args[0]
     contacts = read_file()
     if contacts.get(name):
@@ -76,7 +85,7 @@ def add_phone(*args):
         return f'No contact "{name}"'
 
 #отобразить все
-def add_show(*args):
+def show_all(*args):
     contacts = read_file()
     result = []
     for name, numbers in contacts.items():
@@ -85,22 +94,22 @@ def add_show(*args):
 
 #работа по командам
 commands = {
-    add_hello: "hello",
-    add_add: "add",
-    add_phone: "phone",
-    add_show: "show all",
-    add_change: "change",
-    add_bye: "good bye",
-    add_help: "help"
+    hello_command: ["hello"],
+    add_command : ["add"],
+    add_phone_command: ["phone"],
+    show_all: ["show all"],
+    change_command: ["change"],
+    bye_command: ["good bye", "bye", "."],
+    help_command: ["help"]
     }
 
 def command_parser(user_input):
     data = []
     command = ""
     for k, v in commands.items():
-        if user_input.lower().startswith(v):
+        if any([user_input.lower().startswith(i) for i in v]):
             command = k
-            data = user_input.replace(v, "").split()
+            data = " ".join([user_input.replace(i, "") for i in v]).split()
     return command, data
 
 def start_hello():
@@ -115,7 +124,7 @@ def main():
         command, data = command_parser(user_input)
         if command:
             print(command(*data))
-            if command == add_bye:
+            if command == bye_command:
                 break
         else:
             print("Sorry, unknown command. Try again.")
