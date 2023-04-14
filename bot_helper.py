@@ -1,6 +1,7 @@
 import click
 import json
 
+
 # ошибка ввода
 def input_error(func):
     def wrapper(*args, **kwargs):
@@ -13,7 +14,8 @@ def input_error(func):
 
     return wrapper
 
-#отсутствует файл
+
+# отсутствует файл
 def read_file():
     try:
         with open("contacts.txt", "r", encoding="UTF-8") as file:
@@ -25,43 +27,49 @@ def read_file():
 @input_error
 def help_command():
     help_list = [
-        'help - output command, that help find command',
+        "help - output command, that help find command",
         'hello - output command "How can I help you?"',
         'add - add contact, use "add" "name" "number"',
         'change - change your contact, use "change" "name" "number"',
         'phone - use "phone" "name" that see number this contact',
-        'show all - show all your contacts',
+        "show all - show all your contacts",
     ]
-    return '\n'.join(help_list)
+    return "\n".join(help_list)
+
 
 @input_error
 def bye_command(*args):
     return "Good bye, see you soon"
 
+
 @input_error
 def hello_command(*args):
     return "How can I help You?\nIf you want to know what I can do write Help "
 
-#работа с текстом
+
+# работа с текстом
+
 
 def write_file(contacts):
-    with open('contacts.txt', 'w', encoding='UTF-8') as file:
+    with open("contacts.txt", "w", encoding="UTF-8") as file:
         json.dump(contacts, file)
 
-#создание контакта
+
+# создание контакта
 @input_error
 def add_command(*args):
     name = args[0]
     number = args[1]
     contacts = read_file()
     if contacts.get(args[0]):
-        return 'This contact already exist'
+        return "This contact already exist"
     else:
         contacts.update({name: number})
     write_file(contacts)
     return f'Contact "{name}" add successfully'
 
-#изменение контакта
+
+# изменение контакта
 @input_error
 def change_command(*args):
     name = args[0]
@@ -69,39 +77,43 @@ def change_command(*args):
     contacts = read_file()
     if contacts.get(name):
         # contacts.update({name: number})
-        contacts[name] = number # тут все одно ми вже знаємо, що контакт існує)
+        contacts[name] = number  # тут все одно ми вже знаємо, що контакт існує)
     else:
         return f'No contact "{name}"'
     write_file(contacts)
     return f"Contact '{name}' change successfully"
+
 
 @input_error
 def add_phone_command(*args):
     name = args[0]
     contacts = read_file()
     if contacts.get(name):
-        return '\t{:>20} : {:<12} '.format(name, contacts.get(name))
+        return "\t{:>20} : {:<12} ".format(name, contacts.get(name))
     else:
         return f'No contact "{name}"'
 
-#отобразить все
+
+# отобразить все
 def show_all(*args):
     contacts = read_file()
     result = []
     for name, numbers in contacts.items():
-        result.append('\t{:>20} : {:<12} '.format(name, numbers))
-    return '\n'.join(result)
+        result.append("\t{:>20} : {:<12} ".format(name, numbers))
+    return "\n".join(result)
 
-#работа по командам
+
+# работа по командам
 commands = {
     hello_command: ["hello"],
-    add_command : ["add"],
+    add_command: ["add"],
     add_phone_command: ["phone"],
     show_all: ["show all"],
     change_command: ["change"],
     bye_command: ["good bye", "bye", "."],
-    help_command: ["help"]
-    }
+    help_command: ["help"],
+}
+
 
 def command_parser(user_input):
     data = []
@@ -112,13 +124,14 @@ def command_parser(user_input):
             data = " ".join([user_input.replace(i, "") for i in v]).split()
     return command, data
 
+
 def start_hello():
     return f"Hello, I'm a bot assistent.\nTo get started, write Hello"
 
+
 @click.command()
 def main():
-
-    #начало программы
+    # начало программы
     while True:
         user_input = input(">>> ")
         command, data = command_parser(user_input)
